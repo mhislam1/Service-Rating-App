@@ -5,14 +5,14 @@ const db = require('./db')
 // const morgan = require('morgan'); // Third party middleware
 const app = express();
 
-// Middleware that built into express.
+// Middleware that built into express. Takes data in the body of request and attach to body of request object.  
 app.use(express.json());
 
 // Get all services
 app.get('/api/services', async (request, response) => {
     try {
     const getAllServicesRes = await db.query('SELECT * FROM services');
-    console.log('These are my getAllServicesRes:',getAllServicesRes);
+    // console.log('These are my getAllServicesRes:',getAllServicesRes);
     response.status(200).json({
         status: 'success',
         numberOfResults: getAllServicesRes.rows.length,
@@ -48,11 +48,11 @@ app.post('/api/services', async (request,response) =>{
     try {
         
         const createServiceRes = await db.query('INSERT INTO services (name, location, price_range) VALUES ($1, $2, $3) returning *', [request.body.name, request.body.location, request.body.price_range])
-        console.log(createServiceRes);
+        // console.log(createServiceRes);
         response.status(201).json({
             status: 'success',
             data: {
-                service: 'bank',
+                service: createServiceRes.rows[0]
             }, 
         });
     } catch (error) {
@@ -64,6 +64,7 @@ app.post('/api/services', async (request,response) =>{
 app.put('/api/services/:serviceId', async(request, response) => {
     try {
         const updateServiceRes = await db.query('UPDATE services SET name = $1, location = $2, price_range = $3 where id = $4 returning *', [request.body.name, request.body.location, request.body.price_range, request.params.serviceId]);
+        // console.log(updateServiceRes);
         response.status(200).json({
             status: 'success',
             data: {
